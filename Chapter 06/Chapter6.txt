@@ -1,0 +1,32 @@
+input {
+  file {
+    path => "/var/log/myapp.log"
+  }
+}
+
+
+filter {
+  grok {
+    match => { "message" => "%{TIMESTAMP_ISO8601:timestamp} %{LOGLEVEL:loglevel} %{GREEDYDATA:message}" }
+  }
+}
+
+
+output {
+  elasticsearch {
+    hosts => ["http://localhost:9200"]
+    index => "myapp-logs"
+  }
+}
+
+
+
+Transformation: Shaping Data for Analysis
+filter {
+  grok {
+    match => { "message" => "%{IP:client_ip} - - \[%{HTTPDATE:timestamp}\] \"%{WORD:http_method} %{URIPATHPARAM:request}\" %{NUMBER:response_code}" }
+  }
+}
+
+
+

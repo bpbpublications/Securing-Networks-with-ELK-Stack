@@ -1,0 +1,86 @@
+#! /usr/local/Python_envs/Python3/bin/python3
+import requests
+import json
+#device = input("Enter Device Name/IP :" or "restconf.test.com")
+
+
+restconf_headers = {"Accept": "application/yang-data+json"}
+url = 'https://restconf.test.com:9443/restconf/data/ietf-interfaces:interfaces'
+
+
+r = requests.get(url,
+        headers = restconf_headers,
+        auth=("developer", "Test12345@2qwdewapr"),
+        verify=False)
+
+
+# Print returned data
+print("GET DATA:")
+print(r.text)
+
+
+interfaces = r.json()['ietf-interfaces:interfaces']['interface']
+
+
+for interface in interfaces:
+#    print(f"{interface['name']} -- {interface['description']} -- {interface['ietf-ip:ipv4']['address'][0]['ip']}")
+    print(f"{interface['name']} ")
+
+
+
+flow
+
+
+
+
+#Configuring Exporter map with IPFIX as the exporter version
+
+
+flow exporter-map <m_ipfix>
+destination <192.168.192.1>
+source Loopback 0
+transport udp 1025
+exit
+version ipfix
+template data timeout 600
+options sampler-table
+exit
+
+
+#Configuring Monitor map
+
+
+flow monitor-map <mmp1>
+record ipv4
+option filtered
+exporter <m_ipfix>
+cache entries 10000
+cache timeout active 1800
+cache timeout inactive 15
+exit
+
+
+#Configuring Sampler map
+
+
+sampler-map <smp1>
+random 1 out-of 4000 /*Sampling rate supported is 1:4000*/
+exit
+
+
+#Applying the Monitor map to an interface
+#Now apply the monitor-map mmp1 that is configured with an exporter version IPFIX and sampler-map smp1
+#to the 10GE 0/0/0/2 interface in the ingress direction:
+
+
+
+
+interface 10GE0/0/0/2
+flow ipv4 monitor mmp1 sampler smp1 ingress
+exit
+
+
+
+
+
+
